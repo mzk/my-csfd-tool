@@ -3,9 +3,9 @@
 namespace App\Models\Console;
 
 use App\Entity\Movie;
+use App\Entity\Rating;
 use App\Models\Provider\EntityManagerProvider;
 use App\Models\Utility\Downloader;
-use GuzzleHttp\Client;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -39,6 +39,7 @@ class UserRatingCommand extends BaseCommand
 	protected function execute(InputInterface $input, OutputInterface $output): void
 	{
 		$content = $this->downloader->get('https://www.csfd.cz/uzivatel/116833-mzk/hodnoceni/');
+		$em = $this->entityManagerProvider->getMaster();
 
 		try {
 			$dom = new \DOMDocument();
@@ -48,31 +49,31 @@ class UserRatingCommand extends BaseCommand
 			/** @var \DOMElement $table */
 			$table = $nodesByElement->item(0);
 
-			/*
-
-			<tr>
-						<td><a href="/film/221638-faunuv-labyrint/" class="film c1">Faunův labyrint</a> <span class="film-year" dir="ltr">(2006)</span></td>
-						<td><img src="https://img.csfd.cz/assets/b343/images/rating/stars/4.gif" class="rating" width="32" alt="****" /></td>
-						<td>24.03.2018</td>
-					</tr>
-
-			 */
 			$tbody = $table->getElementsByTagName('tbody')->item(0);
 			$tr = $tbody->getElementsByTagName('tr');
-			/** @var \DOMText $node */
+			/** @var \DOMElement $node */
 			foreach ($tr as $node) {
+				/** @var \DOMElement $href */
+				$csfdUrl = $node->getElementsByTagName('a')->item(0)->getAttribute('href');
+				preg_match('!\d+!', $csfdUrl, $matches);
+				$csfdId = (int)$matches[0];
+				$name = $node->getElementsByTagName('td')->item(0)->nodeValue;
+				$spans = $node->getElementsByTagName('td')->item(0)->getElementsByTagName('span');
+				$year = $spans->item($spans->count() - 1)->nodeValue;
+				preg_match('/\(\d\d\d\d\)/', $year, $matches);
+				$year = (int) str_replace(['(', ')'], '', $matches[0]);
+				$dateOfRating = $node->getElementsByTagName('td')->item(2)->nodeValue;
+				$dateOfRating = \DateTime::createFromFormat('d.m.Y', $dateOfRating);
+				$rating = \strlen($node->getElementsByTagName('td')->item(1)->getElementsByTagName('img')->item(0)->getAttribute('alt'));
 
-
-				$node->textContent;
+				$movie = new Movie($name, null, $year, null, null, $csfdId, $csfdUrl);
+				$rating = new Rating('mzk', $movie, $rating, $dateOfRating);
+				$em->persist($movie);
+				$em->persist($rating);
+				$em->flush();
 			}
 		} catch (\Exception $e) {
 			$e->getMessage();
 		}
-
-		$em = $this->entityManagerProvider->getMaster();
-		$movie = new Movie('sdf', 'sdf', 'sdf', 123, 2323, 'http://sdfsdf');
-		$em->persist($movie);
-		$em->flush();
-
 	}
 }

@@ -26,6 +26,12 @@ class Movie
 	private $description;
 
 	/**
+	 * @ORM\Column(type="smallint", nullable=TRUE)
+	 * @var int
+	 */
+	private $year;
+
+	/**
 	 * @ORM\Column(type="text", nullable=TRUE)
 	 * @var string
 	 */
@@ -61,10 +67,11 @@ class Movie
 	 */
 	private $sourceHtml;
 
-	public function __construct(string $name, string $description, string $actors, float $csfdRating, int $csfdId, string $csfdUrl)
+	public function __construct(string $name, ?string $description, int $year, ?string $actors, ?float $csfdRating, int $csfdId, string $csfdUrl)
 	{
 		$this->name = $name;
 		$this->description = $description;
+		$this->year = $year;
 		$this->actors = $actors;
 		$this->csfdRating = $csfdRating;
 		$this->csfdId = $csfdId;
@@ -139,5 +146,15 @@ class Movie
 	public function setPathToFolder(string $pathToFolder): void
 	{
 		$this->pathToFolder = $pathToFolder;
+	}
+
+	public function setYear(int $year): void
+	{
+		$this->year = $year;
+	}
+
+	public function getYear(): int
+	{
+		return $this->year;
 	}
 }
