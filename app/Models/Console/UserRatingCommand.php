@@ -7,7 +7,6 @@ use App\Entity\Rating;
 use App\Models\Provider\EntityManagerProvider;
 use App\Models\Utility\Downloader;
 use App\Repository\MovieRepository;
-use App\Repository\RatingRepository;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -35,11 +34,6 @@ class UserRatingCommand extends BaseCommand
 	 * @var Movie[]
 	 */
 	private $allMovies;
-
-	/**
-	 * @var Rating[]
-	 */
-	private $allRatings;
 
 	/**
 	 * @var OutputInterface
