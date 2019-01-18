@@ -1,6 +1,7 @@
 #!/usr/bin/env php
 <?php declare(strict_types = 1);
 
+use App\Models\Console\MapperCommand;
 use App\Models\Console\UserRatingCommand;
 use App\Models\Provider\EntityManagerProvider;
 
@@ -29,6 +30,7 @@ $helperSet = new \Symfony\Component\Console\Helper\HelperSet([
 ]);
 $commands = [
 	$container->getByType(UserRatingCommand::class),
+	$container->getByType(MapperCommand::class),
 
 ];
 
