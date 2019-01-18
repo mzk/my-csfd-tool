@@ -24,18 +24,15 @@ class MapperCommand extends BaseCommand
 	protected function execute(InputInterface $input, OutputInterface $output): void
 	{
 		$directories = Finder::findDirectories('*')->in([
-			'/Volumes/video/AkcniKomedie/',
-			'/Volumes/video/Animovane/',
-			'/Volumes/video/Ceske filmy/',
-			'/Volumes/video/Pohadky/',
-			'/Volumes/video/Simca/',
+			'/Volumes/video/aa nove/',
 		]);
 		/** @var \SplFileInfo $directory */
 		foreach ($directories as $directory) {
 			$output->writeln('processing ' . $directory->getBasename());
-			if (\file_exists($directory->getPathname() . '/' . 'csfd.nfo') === false) {
+			if (\file_exists($directory->getPathname() . '/' . 'csfd.nfo') === true) {
 				$output->writeln(\sprintf('moving %s', $directory->getBasename()));
-				\rename($directory->getPathname(), '/Volumes/video/aa nove/' . $directory->getBasename());
+				\rename($directory->getPathname(), '/Volumes/video/AkcniKomedie/' . $directory->getBasename());
+				continue;
 			}
 		}
 	}
