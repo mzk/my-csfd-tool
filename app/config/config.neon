@@ -26,3 +26,5 @@ services:
 	- App\Models\Utility\Panel
 	- App\Models\Console\UserRatingCommand
 	- App\Models\Utility\Downloader(%tempDir%)
+	- App\Repository\MovieRepository
+	- App\Repository\RatingRepository

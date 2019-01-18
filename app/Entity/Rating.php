@@ -3,10 +3,11 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\UniqueConstraint;
 
 /**
  * @ORM\Entity()
- * @ORM\Table()
+ * @ORM\Table(uniqueConstraints={@UniqueConstraint(name="user_movie", columns={"user_name", "movie_id"})})
  */
 class Rating
 {
