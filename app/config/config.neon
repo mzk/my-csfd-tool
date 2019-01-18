@@ -1,0 +1,28 @@
+parameters:
+	dbParams:
+		wrapperClass: 'Doctrine\DBAL\Connections\MasterSlaveConnection'
+		driver: pdo_mysql
+		logging: %debugMode%
+		profiling: %debugMode%
+		master:
+			host: '%database_host%'
+			port: '%database_port%'
+			user: '%database_user%'
+			password: '%database_password%'
+			dbname: '%database_name%'
+		slaves:
+			slave1:
+				host: '%database_host%'
+				port: '%database_port%'
+				user: '%database_user%'
+				password: '%database_password%'
+				dbname: '%database_name%'
+
+php:
+	date.timezone: Europe/Prague
+
+services:
+	- App\Models\Provider\EntityManagerProvider(%dbParams%, [%appDir%/Entity], %debugMode%, %tempDir%/proxies, %redis_host%)
+	- App\Models\Utility\Panel
+	- App\Models\Console\UserRatingCommand
+	- App\Models\Utility\Downloader(%tempDir%)

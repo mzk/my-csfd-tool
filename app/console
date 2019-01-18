@@ -1,0 +1,35 @@
+#!/usr/bin/env php
+<?php declare(strict_types = 1);
+
+use App\Models\Console\UserRatingCommand;
+use App\Models\Provider\EntityManagerProvider;
+
+if (\PHP_SAPI !== 'cli') {
+	die('cli only script!');
+}
+
+/** @var \Nette\DI\Container $container */
+$container = require __DIR__ . '/bootstrap.php';
+
+/** @var EntityManagerProvider $emProvider */
+$emProvider = $container->getByType(EntityManagerProvider::class);
+
+$databaseName = \getenv('databaseName');
+if ($databaseName !== false && \is_string($databaseName)) {
+	$em = $emProvider->getMaster();
+	$db = $em->getConnection();
+	$db->exec(\sprintf('CREATE database IF NOT EXISTS `%s`', $databaseName));
+	$db->exec(\sprintf('USE `%s`', $databaseName));
+}
+
+$helperSet = new \Symfony\Component\Console\Helper\HelperSet([
+	'db' => new \Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper($emProvider->getMaster()->getConnection()),
+	'em' => new \Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper($emProvider->getMaster()),
+	'question' => new \Symfony\Component\Console\Helper\QuestionHelper(),
+]);
+$commands = [
+	$container->getByType(UserRatingCommand::class),
+
+];
+
+\Doctrine\ORM\Tools\Console\ConsoleRunner::run($helperSet, $commands);

@@ -1,0 +1,30 @@
+{
+	"require": {
+		"symfony/console": "^4.2",
+		"nette/bootstrap": "^3.0@dev",
+		"nette/finder": "^3.0@dev",
+		"guzzlehttp/guzzle": "^6.3@dev",
+		"nette/di": "^3.0@dev",
+		"nette/utils": "^3.0@dev",
+		"ext-curl": "*",
+		"ext-intl": "*",
+		"ext-mbstring": "*",
+		"ext-simplexml": "*",
+		"ext-zip": "*",
+		"php": ">=7.2",
+		"doctrine/orm": "~2.5",
+		"tracy/tracy": "^3.0@dev",
+		"nette/caching": "^3.0@dev"
+	},
+	"minimum-stability": "dev",
+	"config": {
+		"platform": {
+			"php": "7.2"
+		}
+	},
+	"autoload": {
+		"psr-4": {
+			"App\\": "app/"
+		}
+	}
+}
