@@ -25,6 +25,9 @@ class MovieRepository
 	{
 		return $this->entityManagerProvider->getMaster()->getRepository(Movie::class)->createQueryBuilder('m', 'm.csfdId')
 			->select('m')
+			//->addSelect('m.csfdId')
+			->addSelect('ratings')
+			->leftJoin('m.ratings', 'ratings')
 			->getQuery()->getResult();
 	}
 }

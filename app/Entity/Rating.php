@@ -44,6 +44,7 @@ class Rating
 		$this->movie = $movie;
 		$this->rating = $rating;
 		$this->date = $date;
+		$movie->addRating($this);
 	}
 
 	public function getUserName(): string

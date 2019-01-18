@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\UniqueConstraint;
 
@@ -68,6 +69,12 @@ class Movie
 	 */
 	private $sourceHtml;
 
+	/**
+	 * @ORM\OneToMany(targetEntity="Rating", mappedBy="movie", cascade={"persist"})
+	 * @var Rating[]|\Doctrine\Common\Collections\ArrayCollection
+	 */
+	private $ratings;
+
 	public function __construct(string $name, ?string $description, int $year, ?string $actors, ?float $csfdRating, int $csfdId, string $csfdUrl)
 	{
 		$this->name = $name;
@@ -77,6 +84,7 @@ class Movie
 		$this->csfdRating = $csfdRating;
 		$this->csfdId = $csfdId;
 		$this->csfdUrl = $csfdUrl;
+		$this->ratings = new ArrayCollection();
 	}
 
 	public function getName(): string
@@ -157,5 +165,29 @@ class Movie
 	public function getYear(): int
 	{
 		return $this->year;
+	}
+
+	/**
+	 * @return Rating[]
+	 */
+	public function getRatings(): array
+	{
+		return $this->ratings->toArray();
+	}
+
+	public function getRatingByUserName(string $userName): ?Rating
+	{
+		foreach ($this->ratings as $rating) {
+			if ($rating->getUserName() === $userName) {
+				return $rating;
+			}
+		}
+
+		return null;
+	}
+
+	public function addRating(Rating $rating): void
+	{
+		$this->ratings->add($rating);
 	}
 }
