@@ -65,7 +65,6 @@ class UserRatingCommand extends BaseCommand
 	{
 		$this->output = $output;
 		$this->allMovies = $this->movieRepository->getAllByCsfdId();
-		$this->allRatings = $this->ratingRepository->getAllByMovieId(self::USER_NAME);
 		$this->parsePage('https://www.csfd.cz/uzivatel/116833-mzk/hodnoceni/');
 
 		for ($i = 2; $i <= 21; $i++) {
@@ -101,7 +100,12 @@ class UserRatingCommand extends BaseCommand
 			$year = (int)str_replace(['(', ')'], '', $matches[0]);
 			$dateOfRating = $node->getElementsByTagName('td')->item(2)->nodeValue;
 			$dateOfRating = \DateTime::createFromFormat('d.m.Y', $dateOfRating);
-			$ratingValue = \strlen($node->getElementsByTagName('td')->item(1)->getElementsByTagName('img')->item(0)->getAttribute('alt'));
+			$img = $node->getElementsByTagName('td')->item(1)->getElementsByTagName('img')->item(0);
+			if ($img === null) {
+				$ratingValue = 0;
+			} else {
+				$ratingValue = \strlen($img->getAttribute('alt'));
+			}
 
 			if (isset($this->allMovies[$csfdId])) {
 				$movie = $this->allMovies[$csfdId];
