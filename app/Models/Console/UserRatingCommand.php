@@ -46,6 +46,11 @@ class UserRatingCommand extends BaseCommand
 	 */
 	private $allRatings;
 
+	/**
+	 * @var OutputInterface
+	 */
+	private $output;
+
 	public function __construct(EntityManagerProvider $entityManagerProvider, Downloader $downloader, MovieRepository $movieRepository, RatingRepository $ratingRepository)
 	{
 		parent::__construct();
@@ -64,6 +69,7 @@ class UserRatingCommand extends BaseCommand
 
 	protected function execute(InputInterface $input, OutputInterface $output): void
 	{
+		$this->output = $output;
 		$this->allMovies = $this->movieRepository->getAllByCsfdId();
 		$this->allRatings = $this->ratingRepository->getAllByMovieId(self::USER_NAME);
 		$this->parsePage('https://www.csfd.cz/uzivatel/116833-mzk/hodnoceni/');
@@ -75,6 +81,7 @@ class UserRatingCommand extends BaseCommand
 
 	public function parsePage(string $url): void
 	{
+		$this->output->writeln('parsing URL: ' . $url);
 		$em = $this->entityManagerProvider->getMaster();
 		$content = $this->downloader->get($url);
 		$dom = new \DOMDocument();
@@ -93,6 +100,7 @@ class UserRatingCommand extends BaseCommand
 			preg_match('!\d+!', $csfdUrl, $matches);
 			$csfdId = (int)$matches[0];
 			$name = $node->getElementsByTagName('td')->item(0)->nodeValue;
+			$this->output->writeln('movie: ' . $name);
 			$spans = $node->getElementsByTagName('td')->item(0)->getElementsByTagName('span');
 			$year = $spans->item($spans->count() - 1)->nodeValue;
 			preg_match('/\(\d\d\d\d\)/', $year, $matches);
