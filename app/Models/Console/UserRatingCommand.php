@@ -37,11 +37,6 @@ class UserRatingCommand extends BaseCommand
 	private $allMovies;
 
 	/**
-	 * @var RatingRepository
-	 */
-	private $ratingRepository;
-
-	/**
 	 * @var Rating[]
 	 */
 	private $allRatings;
@@ -51,13 +46,12 @@ class UserRatingCommand extends BaseCommand
 	 */
 	private $output;
 
-	public function __construct(EntityManagerProvider $entityManagerProvider, Downloader $downloader, MovieRepository $movieRepository, RatingRepository $ratingRepository)
+	public function __construct(EntityManagerProvider $entityManagerProvider, Downloader $downloader, MovieRepository $movieRepository)
 	{
 		parent::__construct();
 		$this->entityManagerProvider = $entityManagerProvider;
 		$this->downloader = $downloader;
 		$this->movieRepository = $movieRepository;
-		$this->ratingRepository = $ratingRepository;
 	}
 
 	protected function configure(): void
@@ -118,8 +112,9 @@ class UserRatingCommand extends BaseCommand
 				$em->flush();
 			}
 
-			if (isset($this->allRatings[$movie->getId()])) {
-				$rating = $this->allRatings[$movie->getId()];
+			$rating = $movie->getRatingByUserName(self::USER_NAME);
+
+			if ($rating instanceof Rating) {
 				$rating->setDate($dateOfRating);
 				$rating->setRating($ratingValue);
 			} else {
