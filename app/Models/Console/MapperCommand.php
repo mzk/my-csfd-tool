@@ -30,6 +30,11 @@ class MapperCommand extends BaseCommand
 
 	protected function execute(InputInterface $input, OutputInterface $output): void
 	{
+		$this->executeParseSearch($input, $output);
+	}
+
+	protected function executeParseSearch(InputInterface $input, OutputInterface $output): void
+	{
 		$directories = Finder::findDirectories('*')->in([
 			'/Volumes/video/aa nove/',
 		]);
