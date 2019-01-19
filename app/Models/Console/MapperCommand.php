@@ -40,10 +40,10 @@ class MapperCommand extends BaseCommand
 	{
 		$directories = Finder::findDirectories('*')->in([
 			'/Volumes/video/AkcniKomedie/',
-			//'/Volumes/video/Animovane/',
+			'/Volumes/video/Animovane/',
 			'/Volumes/video/Ceske filmy/',
-			//'/Volumes/video/Pohadky/',
-			//'/Volumes/video/Simca/',
+			'/Volumes/video/Pohadky/',
+			'/Volumes/video/Simca/',
 		]);
 
 		/** @var \SplFileInfo $directory */
@@ -56,10 +56,10 @@ class MapperCommand extends BaseCommand
 			$csfdNfo = \file_get_contents($directory->getPathname() . '/' . 'csfd.nfo');
 			$xml = new \SimpleXMLElement($csfdNfo);
 
-//			if (Strings::contains((string)$xml->countries, 'Česko') || Strings::contains((string)$xml->countries, 'Česká')) {
-//				$output->writeln(\sprintf('moving into ceske filmy %s', $directory->getBasename()));
-//				\rename($directory->getPathname(), '/Volumes/video/Ceske filmy/' . $directory->getBasename());
-//			}
+			if (Strings::contains((string)$xml->countries, 'Česko') || Strings::contains((string)$xml->countries, 'Česká')) {
+				$output->writeln(\sprintf('moving into ceske filmy %s', $directory->getBasename()));
+				\rename($directory->getPathname(), '/Volumes/video/Ceske filmy/' . $directory->getBasename());
+			}
 
 			if (Strings::contains((string)$xml->genre, 'Animovaný')) {
 				$output->writeln(\sprintf('moving into animované %s', $directory->getBasename()));
