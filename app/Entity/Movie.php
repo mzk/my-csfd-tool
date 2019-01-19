@@ -64,6 +64,12 @@ class Movie
 	private $pathToFolder;
 
 	/**
+	 * @ORM\Column(type="string", nullable=TRUE)
+	 * @var string
+	 */
+	private $countries;
+
+	/**
 	 * @ORM\Column(type="text", nullable=TRUE)
 	 * @var string
 	 */
@@ -189,5 +195,15 @@ class Movie
 	public function addRating(Rating $rating): void
 	{
 		$this->ratings->add($rating);
+	}
+
+	public function getCountries(): string
+	{
+		return $this->countries;
+	}
+
+	public function setCountries(string $countries): void
+	{
+		$this->countries = $countries;
 	}
 }
