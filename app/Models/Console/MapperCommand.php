@@ -19,10 +19,22 @@ class MapperCommand extends BaseCommand
 	 */
 	private $downloader;
 
-	public function __construct(Downloader $downloader)
+	/**
+	 * @var EntityManagerProvider
+	 */
+	private $entityManagerProvider;
+
+	/**
+	 * @var MovieRepository
+	 */
+	private $movieRepository;
+
+	public function __construct(Downloader $downloader, EntityManagerProvider $entityManagerProvider, MovieRepository $movieRepository)
 	{
 		parent::__construct();
 		$this->downloader = $downloader;
+		$this->entityManagerProvider = $entityManagerProvider;
+		$this->movieRepository = $movieRepository;
 	}
 
 	protected function configure(): void
@@ -34,9 +46,43 @@ class MapperCommand extends BaseCommand
 
 	protected function execute(InputInterface $input, OutputInterface $output): void
 	{
-		//		$this->executeParseSearch($input, $output);
-		//		$this->executeDownloadImages($input, $output);
-		$this->executeMoveDirectories($input, $output);
+		//				$this->executeParseSearch($input, $output);
+		//				$this->executeDownloadImages($input, $output);
+		//				$this->executeMoveDirectories($input, $output);
+		$this->executeConnectFileInfoWithDb($input, $output);
+	}
+
+	protected function executeConnectFileInfoWithDb(InputInterface $input, OutputInterface $output): void
+	{
+		$directories = Finder::findDirectories('*')->in([
+			'/Volumes/video/AkcniKomedie/',
+			'/Volumes/video/Animovane/',
+			'/Volumes/video/Ceske filmy/',
+			'/Volumes/video/Pohadky/',
+			'/Volumes/video/Simca/',
+		]);
+
+		$allDbMovies = $this->movieRepository->getAllByCsfdId();
+
+		/** @var \SplFileInfo $directory */
+		foreach ($directories as $directory) {
+			$csfdNfo = \file_get_contents($directory->getPathname() . '/' . 'csfd.nfo');
+			$xml = new \SimpleXMLElement($csfdNfo);
+			$output->writeln(\sprintf('processing %s => %s %s', $directory->getBasename(), (string)$xml->countries, (string)$xml->genre));
+
+			if (isset($allDbMovies[(string)$xml->csfdId])) {
+				$movie = $allDbMovies[(string)$xml->csfdId];
+			} else {
+				$movie = new Movie((string)$xml->title, null, (int)$xml->year, (string)$xml->actors, null, (int)$xml->csfdId, (string)$xml->csfdUrl);
+				$allDbMovies[(string)$xml->csfdId] = $movie;
+				$this->entityManagerProvider->getMaster()->persist($movie);
+			}
+			$movie->setCountries((string)$xml->countries);
+			$movie->setGenre((string)$xml->genre);
+			$movie->setPathToFolder($directory->getPathname());
+
+			$this->entityManagerProvider->getMaster()->flush($movie);
+		}
 	}
 
 	protected function executeMoveDirectories(InputInterface $input, OutputInterface $output): void
