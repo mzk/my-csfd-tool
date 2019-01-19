@@ -4,6 +4,7 @@ namespace App\Models\Console;
 
 use App\Models\Utility\Downloader;
 use Nette\Utils\Finder;
+use Nette\Utils\Strings;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -41,11 +42,11 @@ class MapperCommand extends BaseCommand
 		/** @var \SplFileInfo $directory */
 		foreach ($directories as $directory) {
 			$output->writeln('processing ' . $directory->getBasename());
-//			if (\file_exists($directory->getPathname() . '/' . 'csfd.nfo') === true) {
-//				$output->writeln(\sprintf('moving %s', $directory->getBasename()));
-//				\rename($directory->getPathname(), '/Volumes/video/AkcniKomedie/' . $directory->getBasename());
-//				continue;
-//			}
+			if (\file_exists($directory->getPathname() . '/' . 'csfd.nfo') === true) {
+				$output->writeln(\sprintf('moving %s', $directory->getBasename()));
+				\rename($directory->getPathname(), '/Volumes/video/AkcniKomedie/' . $directory->getBasename());
+				continue;
+			}
 			$content = $this->downloader->get('https://www.csfd.cz/hledat/?q=' . \urlencode($directory->getBasename()));
 
 			$dom = new \DOMDocument();
