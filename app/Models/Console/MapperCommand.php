@@ -60,6 +60,7 @@ class MapperCommand extends BaseCommand
 			'/Volumes/video/Ceske filmy/',
 			'/Volumes/video/Pohadky/',
 			'/Volumes/video/Simca/',
+			'/Volumes/video/Star Wars/',
 		]);
 
 		$allDbMovies = $this->movieRepository->getAllByCsfdId();
