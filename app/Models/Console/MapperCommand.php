@@ -31,7 +31,54 @@ class MapperCommand extends BaseCommand
 
 	protected function execute(InputInterface $input, OutputInterface $output): void
 	{
-		$this->executeParseSearch($input, $output);
+		//		$this->executeParseSearch($input, $output);
+		$this->executeDownloadImages($input, $output);
+	}
+
+	protected function executeDownloadImages(InputInterface $input, OutputInterface $output): void
+	{
+		$directories = Finder::findDirectories('*')->in([
+			'/Volumes/video/AkcniKomedie/',
+			'/Volumes/video/Animovane/',
+			'/Volumes/video/Ceske filmy/',
+			'/Volumes/video/Pohadky/',
+			'/Volumes/video/Simca/',
+		]);
+
+		/** @var \SplFileInfo $directory */
+		foreach ($directories as $directory) {
+			if (\file_exists($directory->getPathname() . '/' . 'csfd.nfo') === false) {
+				$output->writeln(\sprintf('<error>csfd.nfo not exists in %s</error>', $directory->getBasename()));
+				continue;
+			}
+			$output->writeln('processing ' . $directory->getBasename());
+
+			$csfdNfo = \file_get_contents($directory->getPathname() . '/' . 'csfd.nfo');
+			$xml = new \SimpleXMLElement($csfdNfo);
+			if (Strings::contains((string)$xml->thumb, 'https:https://')) {
+				$output->writeln(\sprintf('fix xml->thumb %s', $directory->getBasename()));
+				$xml->thumb = \str_replace('https:https://', 'https://', (string)$xml->thumb);
+				\rename($directory->getPathname() . '/' . 'csfd.nfo', $directory->getPathname() . '/' . 'csfd.nfo.backup');
+				\file_put_contents($directory->getPathname() . '/' . 'csfd.nfo', html_entity_decode($xml->asXML()));
+			}
+
+			$poster = \str_replace('?h180', '', $xml->thumb);
+			$folder = $poster . '?h180';
+
+			$pathToFolderJpg = $directory->getPathname() . '/' . 'folder.jpg';
+			$pathToPosterJpg = $directory->getPathname() . '/' . 'poster.jpg';
+			if (\file_exists($pathToFolderJpg) === false) {
+				$output->writeln(\sprintf('downloading folder for %s', $directory->getBasename()));
+				$image = \file_get_contents($poster);
+				\file_put_contents($pathToFolderJpg, $image);
+			}
+
+			if (\file_exists($pathToPosterJpg) === false) {
+				$output->writeln(\sprintf('downloading poster for %s', $directory->getBasename()));
+				$image = \file_get_contents($folder);
+				\file_put_contents($pathToPosterJpg, $image);
+			}
+		}
 	}
 
 	protected function executeParseSearch(InputInterface $input, OutputInterface $output): void
