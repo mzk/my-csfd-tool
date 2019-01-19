@@ -32,7 +32,40 @@ class MapperCommand extends BaseCommand
 	protected function execute(InputInterface $input, OutputInterface $output): void
 	{
 		//		$this->executeParseSearch($input, $output);
-		$this->executeDownloadImages($input, $output);
+		//		$this->executeDownloadImages($input, $output);
+		$this->executeMoveDirectories($input, $output);
+	}
+
+	protected function executeMoveDirectories(InputInterface $input, OutputInterface $output): void
+	{
+		$directories = Finder::findDirectories('*')->in([
+			'/Volumes/video/AkcniKomedie/',
+			//'/Volumes/video/Animovane/',
+			'/Volumes/video/Ceske filmy/',
+			//'/Volumes/video/Pohadky/',
+			//'/Volumes/video/Simca/',
+		]);
+
+		/** @var \SplFileInfo $directory */
+		foreach ($directories as $directory) {
+			$csfdNfo = \file_get_contents($directory->getPathname() . '/' . 'csfd.nfo');
+			$xml = new \SimpleXMLElement($csfdNfo);
+
+			$output->writeln(\sprintf('processing %s => %s %s', $directory->getBasename(), $xml->countries, $xml->genre));
+
+			$csfdNfo = \file_get_contents($directory->getPathname() . '/' . 'csfd.nfo');
+			$xml = new \SimpleXMLElement($csfdNfo);
+
+//			if (Strings::contains((string)$xml->countries, 'Česko') || Strings::contains((string)$xml->countries, 'Česká')) {
+//				$output->writeln(\sprintf('moving into ceske filmy %s', $directory->getBasename()));
+//				\rename($directory->getPathname(), '/Volumes/video/Ceske filmy/' . $directory->getBasename());
+//			}
+
+			if (Strings::contains((string)$xml->genre, 'Animovaný')) {
+				$output->writeln(\sprintf('moving into animované %s', $directory->getBasename()));
+				\rename($directory->getPathname(), '/Volumes/video/Animovane/' . $directory->getBasename());
+			}
+		}
 	}
 
 	protected function executeDownloadImages(InputInterface $input, OutputInterface $output): void
