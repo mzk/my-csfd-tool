@@ -70,6 +70,12 @@ class Movie
 	private $countries;
 
 	/**
+	 * @ORM\Column(type="string", nullable=TRUE)
+	 * @var string
+	 */
+	private $genre;
+
+	/**
 	 * @ORM\Column(type="text", nullable=TRUE)
 	 * @var string
 	 */
@@ -205,5 +211,15 @@ class Movie
 	public function setCountries(string $countries): void
 	{
 		$this->countries = $countries;
+	}
+
+	public function getGenre(): string
+	{
+		return $this->genre;
+	}
+
+	public function setGenre(string $genre): void
+	{
+		$this->genre = $genre;
 	}
 }
