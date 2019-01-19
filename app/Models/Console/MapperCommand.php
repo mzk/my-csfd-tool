@@ -2,7 +2,10 @@
 
 namespace App\Models\Console;
 
+use App\Entity\Movie;
+use App\Models\Provider\EntityManagerProvider;
 use App\Models\Utility\Downloader;
+use App\Repository\MovieRepository;
 use Nette\Utils\Finder;
 use Nette\Utils\Strings;
 use Symfony\Component\Console\Input\InputInterface;
@@ -40,10 +43,10 @@ class MapperCommand extends BaseCommand
 	{
 		$directories = Finder::findDirectories('*')->in([
 			'/Volumes/video/AkcniKomedie/',
-			'/Volumes/video/Animovane/',
-			'/Volumes/video/Ceske filmy/',
-			'/Volumes/video/Pohadky/',
-			'/Volumes/video/Simca/',
+			//			'/Volumes/video/Animovane/',
+			//			'/Volumes/video/Ceske filmy/',
+			//			'/Volumes/video/Pohadky/',
+			//			'/Volumes/video/Simca/',
 		]);
 
 		/** @var \SplFileInfo $directory */
@@ -56,14 +59,20 @@ class MapperCommand extends BaseCommand
 			$csfdNfo = \file_get_contents($directory->getPathname() . '/' . 'csfd.nfo');
 			$xml = new \SimpleXMLElement($csfdNfo);
 
-			if (Strings::contains((string)$xml->countries, 'Česko') || Strings::contains((string)$xml->countries, 'Česká')) {
-				$output->writeln(\sprintf('moving into ceske filmy %s', $directory->getBasename()));
-				\rename($directory->getPathname(), '/Volumes/video/Ceske filmy/' . $directory->getBasename());
-			}
-
 			if (Strings::contains((string)$xml->genre, 'Animovaný')) {
 				$output->writeln(\sprintf('moving into animované %s', $directory->getBasename()));
 				\rename($directory->getPathname(), '/Volumes/video/Animovane/' . $directory->getBasename());
+				continue;
+			}
+			if (Strings::contains((string)$xml->genre, 'Pohádka')) {
+				$output->writeln(\sprintf('moving into pohadky %s', $directory->getBasename()));
+				\rename($directory->getPathname(), '/Volumes/video/Pohadky/' . $directory->getBasename());
+				continue;
+			}
+			if (Strings::contains((string)$xml->countries, 'Česko') || Strings::contains((string)$xml->countries, 'Česká')) {
+				$output->writeln(\sprintf('moving into ceske filmy %s', $directory->getBasename()));
+				\rename($directory->getPathname(), '/Volumes/video/Ceske filmy/' . $directory->getBasename());
+				continue;
 			}
 		}
 	}
@@ -72,10 +81,10 @@ class MapperCommand extends BaseCommand
 	{
 		$directories = Finder::findDirectories('*')->in([
 			'/Volumes/video/AkcniKomedie/',
-			'/Volumes/video/Animovane/',
-			'/Volumes/video/Ceske filmy/',
-			'/Volumes/video/Pohadky/',
-			'/Volumes/video/Simca/',
+			//			'/Volumes/video/Animovane/',
+			//			'/Volumes/video/Ceske filmy/',
+			//			'/Volumes/video/Pohadky/',
+			//			'/Volumes/video/Simca/',
 		]);
 
 		/** @var \SplFileInfo $directory */
@@ -117,16 +126,20 @@ class MapperCommand extends BaseCommand
 	protected function executeParseSearch(InputInterface $input, OutputInterface $output): void
 	{
 		$directories = Finder::findDirectories('*')->in([
-			'/Volumes/video/aa nove/',
+			'/Volumes/video/AkcniKomedie/',
+			//			'/Volumes/video/Animovane/',
+			//			'/Volumes/video/Ceske filmy/',
+			//			'/Volumes/video/Pohadky/',
+			//			'/Volumes/video/Simca/',
 		]);
 		/** @var \SplFileInfo $directory */
 		foreach ($directories as $directory) {
-			$output->writeln('processing ' . $directory->getBasename());
 			if (\file_exists($directory->getPathname() . '/' . 'csfd.nfo') === true) {
-				$output->writeln(\sprintf('moving %s', $directory->getBasename()));
-				\rename($directory->getPathname(), '/Volumes/video/AkcniKomedie/' . $directory->getBasename());
+				//				$output->writeln(\sprintf('moving %s', $directory->getBasename()));
+				//				\rename($directory->getPathname(), '/Volumes/video/AkcniKomedie/' . $directory->getBasename());
 				continue;
 			}
+			$output->writeln('processing ' . $directory->getBasename());
 			$content = $this->downloader->get('https://www.csfd.cz/hledat/?q=' . \urlencode($directory->getBasename()));
 
 			$dom = new \DOMDocument();
