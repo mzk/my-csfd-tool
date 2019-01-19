@@ -46,9 +46,9 @@ class MapperCommand extends BaseCommand
 
 	protected function execute(InputInterface $input, OutputInterface $output): void
 	{
-		//						$this->executeParseSearch($input, $output);
-		//				$this->executeDownloadImages($input, $output);
-		//						$this->executeMoveDirectories($input, $output);
+		//$this->executeParseSearch($input, $output);
+		//$this->executeDownloadImages($input, $output);
+		//$this->executeMoveDirectories($input, $output);
 		$this->executeConnectFileInfoWithDb($input, $output);
 	}
 
